@@ -15,7 +15,7 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean; \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 RUN apt update
 RUN --mount=type=cache,target=/var/cache/apt \
-    apt install -y -qq build-essential ca-certificates git autoconf automake libtool pkg-config 
+    apt install -y -qq build-essential ca-certificates git autoconf automake libtool pkg-config
 
 # OpenSSL with QUIC interface
 FROM base AS openssl-builder
@@ -56,8 +56,8 @@ RUN --mount=type=bind,from=openssl-builder,source=${OPENSSL_DIR},target=${OPENSS
     && make install
 
 FROM ubuntu:22.04 AS runner
-COPY --link --from=openssl-builder ${OPENSSL_DIR} ${OPENSSL_DIR}
-COPY --link --from=nghttp3-builder ${NGHTTP3_DIR} ${NGHTTP3_DIR}
-COPY --link --from=ngtcp2-builder  ${NGTCP2_DIR}  ${NGTCP2_DIR}
-COPY --link --from=curl-builder    ${CURL_DIR}    ${CURL_DIR}
+COPY --link --from=openssl-builder /usr/local/openssl /usr/local/openssl
+COPY --link --from=nghttp3-builder /usr/local/nghttp3 /usr/local/nghttp3
+COPY --link --from=ngtcp2-builder  /usr/local/ngtcp2  /usr/local/ngtcp2
+COPY --link --from=curl-builder    /usr/local/curl    /usr/local/curl
 ENV PATH ${PATH}:/usr/local/curl/bin
